@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <title>Real Simple View Load Example</title>
+      <script src="../src/realsimple.js"></script>
+      <script type="text/javascript">
+         function loadView() {
+            var view = new View("container");
+            view.loadUrl( "content.html" );
+         }
+
+         function clearView() {
+            dom.getById("container").clear();
+         }
+      </script>
+   </head>
+   <body>
+      <h1>Real Simple JS Ejemplo de View</h1>
+      <p>Para cargar una vista en otra url dinámicame.
+      Tenemos el contendio en al archivo "content.html" y lo queremos poner en
+      un div llamado "container". Entonces hacemos.
+      </p>
+      <pre><code>
+         var view = new View("container");
+         view.loadUrl( "content.html" );
+      </code></pre>
+      <h2>Ejemplo</h2>
+      <p>Haz clic en el botón para cargar la vista dinámicamente</p>
+      <input type="button" id="loader" value="Cargar dinámicamente" onclick="loadView();" />
+      <input type="button" id="eraser" value="Borrar" onclick="clearView();" />
+      <div id="container" style="witdth: 300px; heigth: 300px">
+      </div>
+   </body>
+</html>
