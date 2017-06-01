@@ -1169,6 +1169,30 @@
   function Dom() {
     var self = this;
 
+    var getInput = function(name, value) {
+      var input = dom.create("input");
+      input.setAttribute( "name", name );
+      input.setAttribute( "value", value );
+      return input;
+    }; // end function getInput
+
+    self.submitForm = function( url, data ) {
+      var form = dom.create("form");
+      var keys = Object.keys( data );
+      keys.forEach(
+        function( item, index, collection ) {
+          var input = getInput( item, data[item] );
+          form.appendChild( input );
+        } // end anonymous forEach
+      ); // end forEach
+
+      form.setAttribute( "method", "post" );
+      form.setAttribute( "action", url );
+      document.body.appendChild( form );
+      form.submit();
+      document.body.removeChild( form );
+    }; // end function getForm
+
     /**
      * Sets an on enter to a element
      *
