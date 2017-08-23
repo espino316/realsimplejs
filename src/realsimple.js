@@ -594,6 +594,21 @@
     } // end if not is numeric
   }; // end function Array Sort Desc
 
+  window.BreakException = {};
+  Array.prototype.each = function( fn ) {
+    var self = this;
+    try {
+      var i;
+      var len;
+      len = self.length;
+      for (i = 0; i < len; i++) {
+        fn(self[i], i, self);
+      } // end for
+    } catch (e) {
+      if (e !== BreakException) throw e;
+    } // end catch
+  }; // end forEach
+
   //*** END PROTOTYPES ***///
 
   //** PRIVATE VARIABLES *//
@@ -978,7 +993,7 @@
             params.forEach(fnEach);
           } // end is params not null
         } else {
-          console.log(locationHash + " no route found.");
+          console.warn(locationHash + " no route found.");
           newUrl = locationHash;
         } // end if urlFormat
 
@@ -1020,7 +1035,6 @@
     }; // end function hashChanged
 
     var hashChangedTick = function() {
-      //console.log('tick');
       if (window.location.hash != storedHash) {
         storedHash = window.location.hash;
         hashChanged(storedHash);
@@ -1367,11 +1381,11 @@
             if (nodeName == "img") {
               element.src = value;
             } else {
-              element.value = value;
-            }
-            //var fnEach = function
-            // Here updates the control
-          };
+              if (element != document.activeElement) {
+                element.value = value;
+              } // end if not activeElement
+            } // end if nodeName is img
+          }; // end fnSet
 
           rs.defineSetter(obj, propName, fnSet);
           rs.defineGetter(obj, propName, fnGet);
@@ -1737,313 +1751,314 @@
         return;
       } // end if
 
-      if (data.length > 0) {
-        var table = self.create("table");
-        table.forEachRow = _forEachRow;
-        table.checkedRows = _checkedRows;
-        table.sort = function(property, ascDesc) {
-          if (typeof ascDesc == "undefined") {
-            ascDesc = "asc";
-          } // end if ascDesc is undefined
-        }; // end function table.sort
+      if (data.length == 0) {
+        return dom.create("table");
+      } // end if data len = 0
 
-        if (typeof options != "undefined") {
-          if (typeof options.class != "undefined") {
-            table.addClass(options.class);
-          } // if class not undefined
+      var table = self.create("table");
+      table.forEachRow = _forEachRow;
+      table.checkedRows = _checkedRows;
+      table.sort = function(property, ascDesc) {
+        if (typeof ascDesc == "undefined") {
+          ascDesc = "asc";
+        } // end if ascDesc is undefined
+      }; // end function table.sort
 
-          if (typeof options.id != "undefined") {
-            table.id = options.id;
-          } // end if id defined
-        } // end if options not undefined
+      if (typeof options != "undefined") {
+        if (typeof options.class != "undefined") {
+          table.addClass(options.class);
+        } // if class not undefined
 
-        var firstRow = data[0];
-        var keys = Object.keys(firstRow);
-        var th = null;
+        if (typeof options.id != "undefined") {
+          table.id = options.id;
+        } // end if id defined
+      } // end if options not undefined
 
-        var clearRows = function() {
-          var len = table.rows.length;
-          while (table.rows.length > 1) {
-            table.deleteRow(1);
-          } // end while rows
-        }; // end function clearRows
+      var firstRow = data[0];
+      var keys = Object.keys(firstRow);
+      var th = null;
 
-        var fnEachColumn = function(item, index, array) {
-          th = self.create("th");
-          th.setAttribute("data-sort", "asc");
-          th.style.cursor = "pointer";
+      var clearRows = function() {
+        var len = table.rows.length;
+        while (table.rows.length > 1) {
+          table.deleteRow(1);
+        } // end while rows
+      }; // end function clearRows
 
-          var text = item + arrowUp;
+      var fnEachColumn = function(item, index, array) {
+        th = self.create("th");
+        th.setAttribute("data-sort", "asc");
+        th.style.cursor = "pointer";
+
+        var text = item + arrowUp;
+
+        if (typeof item.name != "undefined") {
+          text = item.name + arrowUp;
+        } // end if name
+
+        if (typeof item.header != "undefined") {
+          text = item.header + arrowUp;
+        } // end if item header
+
+        th.addText(text);
+
+        var sortClick = function() {
+          var self = this;
+          var sort = self.getAttribute("data-sort");
+          var arrow = "";
+          var sortColumn = item;
 
           if (typeof item.name != "undefined") {
-            text = item.name + arrowUp;
-          } // end if name
+            sortColumn = item.name;
+          } // end if name defined
+
+          if (sort == "asc") {
+            sort = "desc";
+            arrow = arrowDown;
+            data.sortDesc(sortColumn);
+          } else {
+            sort = "asc";
+            arrow = arrowUp;
+            data.sortAsc(sortColumn);
+          } // end if as
+
+          self.setAttribute("data-sort", sort);
+
+          sortColumn += arrow;
 
           if (typeof item.header != "undefined") {
-            text = item.header + arrowUp;
-          } // end if item header
+            sortColumn = item.header + arrow;
+          }
 
-          th.addText(text);
+          // Set header text
+          self.innerText = sortColumn;
+          // Clear rows
+          clearRows();
+          // Add rows again
+          data.forEach(fnEachRow);
+        }; // end sortClick function
 
-          var sortClick = function() {
-            var self = this;
-            var sort = self.getAttribute("data-sort");
-            var arrow = "";
-            var sortColumn = item;
+        th.addEventListener("click", sortClick);
+        tr.appendChild(th);
+      }; //end fnEachColumn
 
-            if (typeof item.name != "undefined") {
-              sortColumn = item.name;
-            } // end if name defined
+      var fnEachRow = function(obj, i, arr) {
+        var fnEach = function(item, index, array) {
+          var td = self.create("td");
+          td.addText(obj[item]);
+          tr.appendChild(td);
+        }; // end function fnEach
 
-            if (sort == "asc") {
-              sort = "desc";
-              arrow = arrowDown;
-              data.sortDesc(sortColumn);
-            } else {
-              sort = "asc";
-              arrow = arrowUp;
-              data.sortAsc(sortColumn);
-            } // end if as
+        var fnEachColumn = function(item, index, array) {
+          var row = obj;
+          var td = self.create("td");
 
-            self.setAttribute("data-sort", sort);
+          switch (item.type) {
+            case "checkbox":
+              var checkbox = self.create("input");
+              checkbox.type = "checkbox";
+              checkbox.id = item.name + "_" + i;
+              checkbox.value = row[item.name];
+              td.appendChild(checkbox);
+              break;
 
-            sortColumn += arrow;
+            case "text":
+              if (
+                typeof item.transform != "undefined" &&
+                  typeof item.transform == "function"
+              ) {
+                td.addText(item.transform(row[item.name]));
+              } else if (typeof options.isNull != "undefined") {
+                if (row[item.name] === null) {
+                  td.addText(options.isNull);
+                } // end if null
+              } else {
+                td.addText(row[item.name]);
+              } // end if item.coalesce
+              break;
 
-            if (typeof item.header != "undefined") {
-              sortColumn = item.header + arrow;
-            }
+            case "textbox":
+              var textbox = self.create("input");
+              textbox.type = "text";
+              textbox.value = row[item.name];
+              td.appendChild(textbox);
 
-            // Set header text
-            self.innerText = sortColumn;
-            // Clear rows
-            clearRows();
-            // Add rows again
-            data.forEach(fnEachRow);
-          }; // end sortClick function
+              break;
+            case "select":
+              break;
+            case "hyperlink":
+              var hyperlink = self.create("a");
+              var dataTextFormat = item.dataTextFormat;
+              var dataTextFormatFields = item.dataTextFormatFields;
+              var linkText = item.text;
 
-          th.addEventListener("click", sortClick);
-          tr.appendChild(th);
-        }; //end fnEachColumn
-
-        var fnEachRow = function(obj, i, arr) {
-          var fnEach = function(item, index, array) {
-            var td = self.create("td");
-            td.addText(obj[item]);
-            tr.appendChild(td);
-          }; // end function fnEach
-
-          var fnEachColumn = function(item, index, array) {
-            var row = obj;
-            var td = self.create("td");
-
-            switch (item.type) {
-              case "checkbox":
-                var checkbox = self.create("input");
-                checkbox.type = "checkbox";
-                checkbox.id = item.name + "_" + i;
-                checkbox.value = row[item.name];
-                td.appendChild(checkbox);
-                break;
-
-              case "text":
+              if (typeof item.text == "undefined") {
                 if (
-                  typeof item.transform != "undefined" &&
-                    typeof item.transform == "function"
+                  dataTextFormat !== null &&
+                    typeof dataTextFormat != "undefined"
                 ) {
-                  td.addText(item.transform(row[item.name]));
-                } else if (typeof options.isNull != "undefined") {
-                  if (row[item.name] === null) {
-                    td.addText(options.isNull);
-                  } // end if null
-                } else {
-                  td.addText(row[item.name]);
-                } // end if item.coalesce
-                break;
-
-              case "textbox":
-                var textbox = self.create("input");
-                textbox.type = "text";
-                textbox.value = row[item.name];
-                td.appendChild(textbox);
-
-                break;
-              case "select":
-                break;
-              case "hyperlink":
-                var hyperlink = self.create("a");
-                var dataTextFormat = item.dataTextFormat;
-                var dataTextFormatFields = item.dataTextFormatFields;
-                var linkText = item.text;
-
-                if (typeof item.text == "undefined") {
                   if (
-                    dataTextFormat !== null &&
-                      typeof dataTextFormat != "undefined"
-                  ) {
-                    if (
-                      dataTextFormatFields !== null &&
-                        typeof dataTextFormatFields != "undefined"
-                    ) {
-                      var fnEach = function(fieldName, index, fields) {
-                        var toFind = "@" + fieldName;
-                        dataTextFormat = dataTextFormat.replace(
-                          toFind,
-                          row[fieldName]
-                        );
-                      }; // end fnEach
-                      dataTextFormatFields.forEach(fnEach);
-                      linkText = dataTextFormat;
-                    } else {
-                      linkText = dataTextFormat;
-                    } // end if url fields
-                  } // end if urlFormat
-                }
-                hyperlink.appendChild(document.createTextNode(linkText));
-
-                var urlFormat = item.urlFormat;
-                var urlFormatFields = item.urlFormatFields;
-                var url = "#";
-                if (urlFormat !== null && typeof urlFormat != "undefined") {
-                  if (
-                    urlFormatFields !== null &&
-                      typeof urlFormatFields != "undefined"
+                    dataTextFormatFields !== null &&
+                      typeof dataTextFormatFields != "undefined"
                   ) {
                     var fnEach = function(fieldName, index, fields) {
                       var toFind = "@" + fieldName;
-                      urlFormat = urlFormat.replace(toFind, row[fieldName]);
-                    }; // end fnEach
-                    urlFormatFields.forEach(fnEach);
-                    url = urlFormat;
-                  } else {
-                    url = urlFormat;
-                  } // end if url fields
-                } // end if urlFormat
-                hyperlink.href = url;
-
-                var onclickFormat = item.onclickFormat;
-                var onclickFormatFields = item.onclickFormatFields;
-                var onclick = "";
-                if (
-                  onclickFormat !== null && typeof onclickFormat != "undefined"
-                ) {
-                  if (
-                    onclickFormatFields !== null &&
-                      typeof onclickFormatFields != "undefined"
-                  ) {
-                    var fnEach = function(fieldName, index, fields) {
-                      var toFind = "@" + fieldName;
-                      onclickFormat = onclickFormat.replace(
+                      dataTextFormat = dataTextFormat.replace(
                         toFind,
                         row[fieldName]
                       );
                     }; // end fnEach
-                    onclickFormatFields.forEach(fnEach);
-                    onclick = onclickFormat;
+                    dataTextFormatFields.forEach(fnEach);
+                    linkText = dataTextFormat;
                   } else {
-                    onclick = onclickFormat;
+                    linkText = dataTextFormat;
                   } // end if url fields
                 } // end if urlFormat
+              }
+              hyperlink.appendChild(document.createTextNode(linkText));
 
-                hyperlink.setAttribute("onclick", onclick);
-                td.appendChild(hyperlink);
+              var urlFormat = item.urlFormat;
+              var urlFormatFields = item.urlFormatFields;
+              var url = "#";
+              if (urlFormat !== null && typeof urlFormat != "undefined") {
+                if (
+                  urlFormatFields !== null &&
+                    typeof urlFormatFields != "undefined"
+                ) {
+                  var fnEach = function(fieldName, index, fields) {
+                    var toFind = "@" + fieldName;
+                    urlFormat = urlFormat.replace(toFind, row[fieldName]);
+                  }; // end fnEach
+                  urlFormatFields.forEach(fnEach);
+                  url = urlFormat;
+                } else {
+                  url = urlFormat;
+                } // end if url fields
+              } // end if urlFormat
+              hyperlink.href = url;
 
-                break;
-              case "hidden":
-                var hidden = self.create("input");
-                hidden.type = "hidden";
-                hidden.value = row[item.name];
-                td.appendChild(hidden);
-                break;
+              var onclickFormat = item.onclickFormat;
+              var onclickFormatFields = item.onclickFormatFields;
+              var onclick = "";
+              if (
+                onclickFormat !== null && typeof onclickFormat != "undefined"
+              ) {
+                if (
+                  onclickFormatFields !== null &&
+                    typeof onclickFormatFields != "undefined"
+                ) {
+                  var fnEach = function(fieldName, index, fields) {
+                    var toFind = "@" + fieldName;
+                    onclickFormat = onclickFormat.replace(
+                      toFind,
+                      row[fieldName]
+                    );
+                  }; // end fnEach
+                  onclickFormatFields.forEach(fnEach);
+                  onclick = onclickFormat;
+                } else {
+                  onclick = onclickFormat;
+                } // end if url fields
+              } // end if urlFormat
 
-              case "textarea":
-                var textarea = self.create("textarea");
-                textarea.value = row[item.name];
-                td.appendChild(textarea);
-                break;
+              hyperlink.setAttribute("onclick", onclick);
+              td.appendChild(hyperlink);
 
-              case "image":
-                var img = self.create("img");
-                urlFormat = item.urlFormat;
-                urlFormatFields = item.urlFormatFields;
-                url = "#";
-                if (urlFormat !== null) {
-                  if (urlFormatFields !== null) {
-                    var fnEach = function(fieldName, index, fields) {
-                      var toFind = "@" + fieldName;
-                      urlFormat = urlFormat.replace(toFind, row[fieldName]);
-                    }; // end fnEach
+              break;
+            case "hidden":
+              var hidden = self.create("input");
+              hidden.type = "hidden";
+              hidden.value = row[item.name];
+              td.appendChild(hidden);
+              break;
 
-                    urlFormatFields.forEach(fnEach);
-                    url = urlFormat;
-                  } else {
-                    url = urlFormat;
-                  } // end if url fields
-                } // end if urlFormat
+            case "textarea":
+              var textarea = self.create("textarea");
+              textarea.value = row[item.name];
+              td.appendChild(textarea);
+              break;
 
-                img.src = url;
-                img.style.height = item.height;
-                img.style.width = item.width;
-                td.appendChild(img);
-                break;
+            case "image":
+              var img = self.create("img");
+              urlFormat = item.urlFormat;
+              urlFormatFields = item.urlFormatFields;
+              url = "#";
+              if (urlFormat !== null) {
+                if (urlFormatFields !== null) {
+                  var fnEach = function(fieldName, index, fields) {
+                    var toFind = "@" + fieldName;
+                    urlFormat = urlFormat.replace(toFind, row[fieldName]);
+                  }; // end fnEach
 
-            } // end switch
+                  urlFormatFields.forEach(fnEach);
+                  url = urlFormat;
+                } else {
+                  url = urlFormat;
+                } // end if url fields
+              } // end if urlFormat
 
-            tr.appendChild(td);
-          }; // end function fnEach
+              img.src = url;
+              img.style.height = item.height;
+              img.style.width = item.width;
+              td.appendChild(img);
+              break;
 
-          tr = self.create("tr");
-          tr.forEachCell = _forEachCell;
-          tr.data = obj;
+          } // end switch
 
-          if (typeof options != "undefined") {
-            if (typeof options.onclick != "undefined") {
-              var caller = function() {
-                options.onclick(obj);
-              }; // end caller
-              tr.addEventListener("click", caller);
-            } // end if onclick
-          } // end if options
+          tr.appendChild(td);
+        }; // end function fnEach
 
-          if (typeof options != "undefined") {
-            if (typeof options.columns != "undefined") {
-              options.columns.forEach(fnEachColumn);
-            } else {
-              keys.forEach(fnEach);
-            } // end if then else columns
-          } else {
-            keys.forEach(fnEach);
-          } // end if then else options
-
-          if (typeof options != "undefined") {
-            if (typeof options.backgroundColorField != "undefined") {
-              tr.style.backgroundColor = obj[options.backgroundColorField];
-            } // end if bgColorField
-          } // end if options undefined
-
-          console.log("tr", tr.forEachCell);
-          table.appendChild(tr);
-        }; // end function fnEachRow
-
-        var tr = self.create("tr");
-        tr.setAttribute("data-rowheader", true);
+        tr = self.create("tr");
         tr.forEachCell = _forEachCell;
-        tr.data = keys;
+        tr.data = obj;
+
+        if (typeof options != "undefined") {
+          if (typeof options.onclick != "undefined") {
+            var caller = function() {
+              options.onclick(obj);
+            }; // end caller
+            tr.addEventListener("click", caller);
+          } // end if onclick
+        } // end if options
 
         if (typeof options != "undefined") {
           if (typeof options.columns != "undefined") {
             options.columns.forEach(fnEachColumn);
           } else {
-            keys.forEach(fnEachColumn);
+            keys.forEach(fnEach);
           } // end if then else columns
         } else {
-          keys.forEach(fnEachColumn);
+          keys.forEach(fnEach);
         } // end if then else options
 
-        table.appendChild(tr);
+        if (typeof options != "undefined") {
+          if (typeof options.backgroundColorField != "undefined") {
+            tr.style.backgroundColor = obj[options.backgroundColorField];
+          } // end if bgColorField
+        } // end if options undefined
 
-        data.forEach(fnEachRow);
-        return table;
-      } // end if data len > 0
+        table.appendChild(tr);
+      }; // end function fnEachRow
+
+      var tr = self.create("tr");
+      tr.setAttribute("data-rowheader", true);
+      tr.forEachCell = _forEachCell;
+      tr.data = keys;
+
+      if (typeof options != "undefined") {
+        if (typeof options.columns != "undefined") {
+          options.columns.forEach(fnEachColumn);
+        } else {
+          keys.forEach(fnEachColumn);
+        } // end if then else columns
+      } else {
+        keys.forEach(fnEachColumn);
+      } // end if then else options
+
+      table.appendChild(tr);
+
+      data.forEach(fnEachRow);
+      return table;
     }; // end function getTableFromData
 
     /**
@@ -2052,14 +2067,18 @@
      * @param data The data to create the table
      * @param options The options of the table
      */
-    self.setDataTable = function(id, data, options) {
-      var table = self.getTableFromData(data, options);
-      var tableParent = self.getById(id);
-      tableParent.clear();
-      table.addClass("table table-hover");
-      tableParent.appendChild(table);
-      return table;
-    }; // end function getDOMTable
+  self.setDataTable = function(id, data, options) {
+    var tableParent = dom.getById(id);
+    if ( tableParent == null ) {
+      console.error( tableParent + " do not exists" );
+    } // end oif tableParent null
+
+    var table = self.getTableFromData(data, options);
+    tableParent.clear();
+    table.addClass("table table-hover");
+    tableParent.appendChild(table);
+    return table;
+  }; // end function getDOMTable
 
     /**
      * Represents a data table
@@ -2125,7 +2144,7 @@
         return getAll();
       } // end if itemKey undefined
       if (window.localStorage.getItem(itemKey) === null) {
-        console.log("Item " + itemKey + " do not exists");
+        console.warn("Item " + itemKey + " do not exists");
         return null;
       }
 
@@ -2356,12 +2375,12 @@
               if (item !== "") {
                 var parts = item.split(": ");
                 var tmp = {};
-                res.headers[parts[0].trim()] = parts[1].trim();
+                res.headers[parts[0].trim().toLowerCase()] = parts[1].trim();
               } // end if item != ''
             }; // end fnEach
             headers.forEach(fnEach);
             res.status = xhttp.status;
-            if (res.headers["Content-Type"] == "application/json") {
+            if (res.headers["content-type"] == "application/json") {
               res.data = JSON.parse(xhttp.response);
             } else {
               res.data = xhttp.response;
@@ -2428,6 +2447,9 @@
         } // end if isBinary
       } // end if method = get
     }; // end function request
+
+    // Download a file submiting a form
+    self.downloadFile = dom.submitForm;
   } // end class Http
 
   var http = new Http();
@@ -2601,9 +2623,11 @@
 
     self.loadUrl = function(url, data, fn) {
       self.setContent();
-      if (typeof data == "object" || data === null) {
-        data = new RSObject(data);
-      }
+      if (data === null) {
+        data = new RSObject( data );
+      } else if ( data.constructor.toString().contains("Object") ) {
+        data = new RSObject( data );
+      }  // end if data = object
 
       //url = url + "?" + String((Math.random() * 10000000000000000) + 1);
       var onSuccess = function(response) {
@@ -2621,9 +2645,12 @@
     }; // end function load
 
     self.loadTemplate = function(id, data) {
-      if (typeof data == "object" || data === null) {
-        data = new RSObject(data);
-      } // end if data = object
+      if (data === null) {
+        data = new RSObject( data );
+      } else if ( data.constructor.toString().contains("Object") ) {
+        data = new RSObject( data );
+      }  // end if data = object
+
       var html = dom.getById(id).innerHTML;
       self.loadHTML(html, data);
       dom.bindData();
@@ -2866,13 +2893,11 @@
         url,
         null,
         function(response) {
-          console.log(response.data);
           var view;
           var temp = "";
           if (typeof data != "undefined") {
             view = new View();
             temp = view.populateTemplate(response.data, data);
-            console.log("temp", temp);
           } else {
             temp = response.data;
           } // end if then else data undefined
