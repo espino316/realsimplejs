@@ -1,0 +1,42 @@
+define(
+  ["rs"],
+  function( RS ) {
+
+    var rs = new RS();
+
+    /**
+     * Watch variables and report changes
+     */
+    function Watcher() {
+      var self = this;
+      this.collection = [];
+
+      this.add = function(name, fn) {
+        var item = {};
+        item.name = name;
+        item.currentValue = rs.returnValue(name);
+        item.function = fn;
+        this.collection.push(item);
+      }; // end function add
+
+      // The tick event
+      var fn = function() {
+        var fnEach = function(item, index, arr) {
+          var val = rs.returnValue(item.name);
+
+          if (val != item.currentValue) {
+            // And here we reverse dom
+            item.function(item.name);
+            item.currentValue = val;
+          }
+        }; // end fnEach
+        self.collection.forEach(fnEach);
+      }; // end fn
+
+      setInterval(fn, 200);
+    } // end function watcher
+
+    return Watcher;
+
+  } // end anonymous
+); // end define

@@ -81,7 +81,7 @@ define(
      *
      * @return {undefined}
      */
-    function RSPromise( functionPromise ) {
+    return function RSPromise( functionPromise ) {
       // To self reference
       var self = this;
 
@@ -276,9 +276,12 @@ define(
         ); // end functionPromise call
       } // end if functionPromise
     } // end RSPromise
+
+    return RSPromise;
   } // end anonymous function define
 ); // end define
 
+/*
 var p = new RSPromise(function(resolve, reject) {
 
 	// Do an async task async task and then...
@@ -294,3 +297,4 @@ var p = new RSPromise(function(resolve, reject) {
 p.then(function(r) {
   console.log( r );
 })
+*/
