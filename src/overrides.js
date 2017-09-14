@@ -1,6 +1,3 @@
-define(
-  [],
-  function() {
     if (!Date.now) {
       Date.now = function() {
         return new Date().getTime();
@@ -524,7 +521,4 @@ define(
         if (e !== BreakException) throw e;
       } // end catch
     }; // end forEach
-
-    return {};
-  } // end anonymous function
-); // end define
+//    module.exports = {};

@@ -1,50 +1,106 @@
-define(
-  [],
-  function() {
-    /** DateHelper **/
-    function DateHelper() {
-      this.timestamp = function() {
-        return Math.floor(Date.now() / 1000); // end Math floor
-      }; // end function timestamp
+/** DateHelper **/
+function DateHelper() {
+  var self = this;
 
-      this.getDateParts = function(date) {
-        var dateObj = new Date();
-        if (typeof date != "undefined") {
-          dateObj = new Date(date);
-        }
+  self.timestamp = function() {
+    return Math.floor(Date.now() / 1000); // end Math floor
+  }; // end function timestamp
 
-        var month = dateObj.getUTCMonth() + 1; //months from 1-12
-        var day = dateObj.getUTCDate();
-        var year = dateObj.getUTCFullYear();
-        var hour = dateObj.getUTCHours();
-        var minutes = dateObj.getUTCMinutes();
-        var seconds = dateObj.getUTCSeconds();
-        month = "00" + month;
-        month = String(month).right(2);
-        day = "00" + day;
-        day = String(day).right(2);
-        hour = "00" + hour;
-        hour = String(hour).right(2);
-        minutes = "00" + minutes;
-        minutes = String(minutes).right(2);
-        seconds = "00" + seconds;
-        seconds = String(seconds).right(2);
-        var newTime = hour + ":" + minutes + ":" + seconds;
-        var newDate = year + "/" + month + "/" + day;
+  self.getDateParts = function(date) {
+    var dateObj = new Date();
+    if (typeof date != "undefined") {
+      dateObj = new Date(date);
+    }
 
-        var dateParts = {};
-        dateParts.year = year;
-        dateParts.month = month;
-        dateParts.day = day;
-        dateParts.hour = hour;
-        dateParts.date = newDate;
-        dateParts.minutes = minutes;
-        dateParts.seconds = seconds;
-        dateParts.time = newTime;
-        return dateParts;
-      };
-    } // end function DateHelper
+    var month = dateObj.getUTCMonth() + 1; //months from 1-12
+    var day = dateObj.getUTCDate();
+    var year = dateObj.getUTCFullYear();
+    var hour = dateObj.getUTCHours();
+    var minutes = dateObj.getUTCMinutes();
+    var seconds = dateObj.getUTCSeconds();
+    month = "00" + month;
+    month = String(month).right(2);
+    day = "00" + day;
+    day = String(day).right(2);
+    hour = "00" + hour;
+    hour = String(hour).right(2);
+    minutes = "00" + minutes;
+    minutes = String(minutes).right(2);
+    seconds = "00" + seconds;
+    seconds = String(seconds).right(2);
+    var newTime = hour + ":" + minutes + ":" + seconds;
+    var newDate = year + "/" + month + "/" + day;
 
-    return DateHelper;
-  } // end function anonymous
-); // end define
+    var dateParts = {};
+    dateParts.year = year;
+    dateParts.month = month;
+    dateParts.day = day;
+    dateParts.hour = hour;
+    dateParts.date = newDate;
+    dateParts.minutes = minutes;
+    dateParts.seconds = seconds;
+    dateParts.time = newTime;
+    return dateParts;
+  };
+
+  var dateDiffPeriods = function(date1, date2){
+    var diff = date1-date2;
+    var seconds = parseFloat((diff / 1000).toFixed(2));
+    var minutes = parseFloat((seconds / 60).toFixed(2));
+    var hours = parseFloat((minutes / 60).toFixed(2));
+    var days = parseFloat((hours / 24).toFixed(2));
+    var months = parseFloat((days / 30.4167).toFixed(2));
+    var years = parseFloat((months / 12).toFixed(2));
+    return {
+      second: seconds,
+      minute: minutes,
+      hour: hours,
+      day: days,
+      month: months,
+      year: years
+    }; // end object return
+  } // end dateDiffPeriods
+
+  var getInterval = function( interval ) {
+    var intervals = {
+      s: "second",
+      sec: "second",
+      second: "second",
+      S: "second",
+      SEC: "second",
+      SECOND: "second",
+      m: "minute",
+      min: "minute",
+      minute: "minute",
+      MIN: "minute",
+      MINUTE: "minute",
+      h: "hour",
+      H: "hour",
+      hour: "hour",
+      Hour: "hour",
+      HOUR: "hour",
+      d: "day",
+      day: "day",
+      D: "day",
+      DAY: "day",
+      M: "month",
+      MONTH: "month",
+      month: "month",
+      Y: "year",
+      y: "year",
+      year: "year",
+      YEAR: "year",
+    }; // intervals
+
+    if ( intervals.hasOwnProperty( interval ) ) {
+      return intervals[interval];
+    } // end if intervals
+
+    console.error( interval + " interval do not exists" );
+  }; // end gerInterval
+
+  self.dateDiff = function( interval, date1, date2 ) {
+    var diffs = dateDiffPeriods( date1, date2 );
+    return diffs[ getInterval( interval ) ];
+  }; // end dateDiff
+} // end function DateHelper
