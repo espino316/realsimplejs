@@ -521,4 +521,48 @@ Array.prototype.each = function( fn ) {
     if (e !== BreakException) throw e;
   } // end catch
 }; // end forEach
-//    module.exports = {};
+
+/**
+ * Sum the property "prop" in array of objects
+ *
+ * @param {String} prop The property to sum
+ *
+ * @return Number
+ */
+Array.prototype.sum = function( prop ) {
+  var self = this;
+  if ( self.length === 0 ) {
+    return 0;
+  } // end if
+
+  if ( typeof self[0] != "object" ) {
+    console.error( "Items are not objects" );
+    return;
+  } // end if not object
+
+  if ( ! self[0].hasOwnProperty( prop ) ) {
+    console.error( "Items does not have a " + prop +  " property." );
+    return;
+  } // end if not prop
+
+  var sum = 0;
+  self.forEach(
+    function( item ) {
+      sum += Number(item[prop]);
+    } // end anonymous forEach
+  ); // end forEach
+
+  return sum;
+}; // end Array.sum
+
+//*** END PROTOTYPES ***///
+
+/**
+ * Exception class
+ *
+ * @return {undefined}
+ */
+window.Exception = function(message, reference) {
+  this.message = message;
+  this.reference = reference;
+}; // end class Exception

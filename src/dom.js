@@ -151,21 +151,18 @@ function Dom() {
   };
 
   self.populateSelect = function(select, data, valueField, textField, value) {
+    if ( typeof value == "undefined" || value === null ) {
+      value = data[0][valueField];
+    } // end if no value
     var forEachItem = function(item, key, arr) {
       var option = self.create("option");
       option.value = item[valueField];
       option.innerHTML = item[textField];
-      if (
-        typeof value != "undefined" &&
-          value !== null &&
-          value === item[valueField]
-      ) {
-        option.selected = true;
-      } // end if value defined
       select.appendChild(option);
     };
 
     data.forEach(forEachItem);
+    select.value = value;
   }; // end function populateSelect
 
   self.create = function(nodeName) {
@@ -358,12 +355,16 @@ function Dom() {
     var forEachBinded = function(element, key, arr) {
       var nodeName = element.nodeName.toLowerCase();
       var bindable = element.getAttribute("data-bind");
+      var dataRepeater = element.getAttribute("data-repeater");
 
       if (
         nodeName == "select" || nodeName == "input" || nodeName == "textarea"
       ) {
         if (!rs.evalUndefined(bindable)) {
-          element.value = rs.returnValue(bindable);
+          var val = rs.returnValue(bindable);
+          if ( val !== null ) {
+            element.value = val;
+          }
         } // end if bindable
       } else if (nodeName == "img") {
         element.src = rs.returnValue(bindable);
@@ -438,6 +439,24 @@ function Dom() {
           var newTable = self.getTableFromData(data, options);
           self.replaceTable(element, newTable);
         } // end if bindable
+      } else if ( dataRepeater == "true" ) {
+        var data = rs.returnValue( element.getAttribute("data-source") );
+        if ( data === null ) {
+          console.error( "DataRepeater.data is null" );
+          return;
+        }
+        var view = new View();
+        var temp = view.populateElement( element.firstElementChild, data );
+        element.clear();
+        if ( temp.constructor.toString().contains("Array") ) {
+          temp.forEach(
+            function( item ) {
+              element.append(item);
+            } // end anonymous foreach
+          ); // end temp for each
+        } else {
+          element.append(temp);
+        } // end if is array
       } else {
         element.innerHTML = rs.returnValue(bindable);
       } // end if nodeName
@@ -924,3 +943,5 @@ self.setDataTable = function(id, data, options) {
     return me;
   }; // end function DataTable
 } // end function Dom
+
+window.dom = new Dom();

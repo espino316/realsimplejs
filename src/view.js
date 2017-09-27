@@ -74,6 +74,36 @@ function View(id) {
     dom.bindData();
   }; // end function load
 
+  self.populateElement = function( el, data ) {
+    if (typeof data != "undefined" && data !== null) {
+      if (typeof data.length != "undefined") {
+        var result = [];
+        var fEach = function(item, index, collection) {
+          result.push(self.populateElement(el, item));
+        }; // end fEach
+        data.forEach(fEach);
+        return result;
+      } else {
+        if (data !== null) {
+          data = new RSObject(data);
+          var copyEl = el.cloneNode(true);
+          copyEl.dataItem = data;
+          var bindedElements = copyEl.querySelectorAll("[data-bind]");
+          bindedElements.forEach(
+            function( element ) {
+              var dataBind = element.getAttribute( "data-bind" );
+              var nodeName = element.nodeName.toLowerCase();
+              if ( nodeName == "div" || nodeName == "span" ) {
+                element.innerHTML = data[dataBind];
+              } // end if nodeName div or span
+            } // end anonymous forEach
+          ); // end forEach
+          return copyEl;
+        } // end if data not null
+      } // end if data length undefined
+    } // end if data not undefined
+  }; // end populateElement
+
   self.populateTemplate = function(template, data) {
     if (typeof data != "undefined" && data !== null) {
       if (typeof data.length != "undefined") {

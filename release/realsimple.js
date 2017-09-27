@@ -395,6 +395,31 @@ Array.prototype.each = function(fn) {
     }
 };
 
+Array.prototype.sum = function(prop) {
+    var self = this;
+    if (self.length === 0) {
+        return 0;
+    }
+    if (typeof self[0] != "object") {
+        console.error("Items are not objects");
+        return;
+    }
+    if (!self[0].hasOwnProperty(prop)) {
+        console.error("Items does not have a " + prop + " property.");
+        return;
+    }
+    var sum = 0;
+    self.forEach(function(item) {
+        sum += Number(item[prop]);
+    });
+    return sum;
+};
+
+window.Exception = function(message, reference) {
+    this.message = message;
+    this.reference = reference;
+};
+
 function CookieHelper() {
     var self = this;
     self.set = function(name, value, days) {
@@ -542,10 +567,11 @@ CssAnimation.prototype.toString = function() {
 };
 
 function DateHelper() {
-    this.timestamp = function() {
+    var self = this;
+    self.timestamp = function() {
         return Math.floor(Date.now() / 1e3);
     };
-    this.getDateParts = function(date) {
+    self.getDateParts = function(date) {
         var dateObj = new Date();
         if (typeof date != "undefined") {
             dateObj = new Date(date);
@@ -579,7 +605,31 @@ function DateHelper() {
         dateParts.time = newTime;
         return dateParts;
     };
+    self.diff = function(date1, date2) {
+        var diff = date2 - date1;
+        var seconds = parseFloat((diff / 1e3).toFixed(2));
+        var minutes = parseFloat((seconds / 60).toFixed(2));
+        var hours = parseFloat((minutes / 60).toFixed(2));
+        var days = parseFloat((hours / 24).toFixed(2));
+        var months = parseFloat((days / 30.4167).toFixed(2));
+        var years = parseFloat((months / 12).toFixed(2));
+        return {
+            second: seconds,
+            minute: minutes,
+            hour: hours,
+            day: days,
+            month: months,
+            year: years
+        };
+    };
 }
+
+window.date = new DateHelper();
+
+Date.prototype.diff = function(date2) {
+    var self = this;
+    return date.diff(self, date2);
+};
 
 function Dialog() {
     this.showAlert = function(msg, title, buttonText) {
@@ -633,6 +683,9 @@ function RS() {
         f();
     };
     this.returnValue = function(bindable) {
+        if (bindable === null) {
+            return null;
+        }
         var self = this;
         var parts = bindable.split(".");
         if (parts.length > 0) {
@@ -1111,16 +1164,17 @@ function Dom() {
         return sel;
     };
     self.populateSelect = function(select, data, valueField, textField, value) {
+        if (typeof value == "undefined" || value === null) {
+            value = data[0][valueField];
+        }
         var forEachItem = function(item, key, arr) {
             var option = self.create("option");
             option.value = item[valueField];
             option.innerHTML = item[textField];
-            if (typeof value != "undefined" && value !== null && value === item[valueField]) {
-                option.selected = true;
-            }
             select.appendChild(option);
         };
         data.forEach(forEachItem);
+        select.value = value;
     };
     self.create = function(nodeName) {
         var element = document.createElement(nodeName);
@@ -1280,9 +1334,13 @@ function Dom() {
         var forEachBinded = function(element, key, arr) {
             var nodeName = element.nodeName.toLowerCase();
             var bindable = element.getAttribute("data-bind");
+            var dataRepeater = element.getAttribute("data-repeater");
             if (nodeName == "select" || nodeName == "input" || nodeName == "textarea") {
                 if (!rs.evalUndefined(bindable)) {
-                    element.value = rs.returnValue(bindable);
+                    var val = rs.returnValue(bindable);
+                    if (val !== null) {
+                        element.value = val;
+                    }
                 }
             } else if (nodeName == "img") {
                 element.src = rs.returnValue(bindable);
@@ -1348,6 +1406,22 @@ function Dom() {
                     options.columns = columns;
                     var newTable = self.getTableFromData(data, options);
                     self.replaceTable(element, newTable);
+                }
+            } else if (dataRepeater == "true") {
+                var data = rs.returnValue(element.getAttribute("data-source"));
+                if (data === null) {
+                    console.error("DataRepeater.data is null");
+                    return;
+                }
+                var view = new View();
+                var temp = view.populateElement(element.firstElementChild, data);
+                element.clear();
+                if (temp.constructor.toString().contains("Array")) {
+                    temp.forEach(function(item) {
+                        element.append(item);
+                    });
+                } else {
+                    element.append(temp);
                 }
             } else {
                 element.innerHTML = rs.returnValue(bindable);
@@ -1696,6 +1770,8 @@ function Dom() {
         return me;
     };
 }
+
+window.dom = new Dom();
 
 (function() {
     var States = {
@@ -2288,6 +2364,33 @@ function View(id) {
         self.content.innerHTML = html;
         dom.bindData();
     };
+    self.populateElement = function(el, data) {
+        if (typeof data != "undefined" && data !== null) {
+            if (typeof data.length != "undefined") {
+                var result = [];
+                var fEach = function(item, index, collection) {
+                    result.push(self.populateElement(el, item));
+                };
+                data.forEach(fEach);
+                return result;
+            } else {
+                if (data !== null) {
+                    data = new RSObject(data);
+                    var copyEl = el.cloneNode(true);
+                    copyEl.dataItem = data;
+                    var bindedElements = copyEl.querySelectorAll("[data-bind]");
+                    bindedElements.forEach(function(element) {
+                        var dataBind = element.getAttribute("data-bind");
+                        var nodeName = element.nodeName.toLowerCase();
+                        if (nodeName == "div" || nodeName == "span") {
+                            element.innerHTML = data[dataBind];
+                        }
+                    });
+                    return copyEl;
+                }
+            }
+        }
+    };
     self.populateTemplate = function(template, data) {
         if (typeof data != "undefined" && data !== null) {
             if (typeof data.length != "undefined") {
@@ -2328,17 +2431,16 @@ function View(id) {
 
 function Modal() {
     var self = this;
-    var dom = new Dom();
-    var http = new Http();
-    var divModal = dom.getById("modal");
+    var divModal = dom.getById("modalContainer");
     var divModalContent = dom.getById("modalContent");
+    var divTitle, divMessage, divButton, divClose;
     self.getContainer = function() {
         return divModal;
     };
     var fnLoadModal = function() {
         if (divModal === null) {
             divModal = dom.create("div");
-            divModal.id = "modal";
+            divModal.id = "modalContainer";
             divModal.addClass("modal");
         }
         if (divModalContent === null) {
@@ -2347,41 +2449,38 @@ function Modal() {
             divModalContent.addClass("modalContent");
             divModal.appendChild(divModalContent);
         }
-        if (dom.getById("modal") === null) {
+        if (dom.getById("modalContainer") === null) {
             var body = dom.get("body");
             body.appendChild(divModal);
         }
     };
     rs.onReady(fnLoadModal);
+    var self = this;
+    self.trimereet = "";
     self.showUrl = function(url, data) {
+        if (divModal === null) {
+            fnLoadModal();
+        }
         divModalContent.style.width = "70%";
         divModalContent.style.height = "70vh";
         divModalContent.style.marginTop = "20vh";
         divModalContent.clear();
         var view = new View("modalContent");
-        if (typeof data != "undefined") {
+        if (typeof data != "undefined" && data !== null) {
             view.loadUrl(url, data);
         } else {
             view.loadUrl(url);
         }
         divModal.style.display = "block";
-        http.post(url, null, function(response) {
-            var view;
-            var temp = "";
-            if (typeof data != "undefined") {
-                view = new View();
-                temp = view.populateTemplate(response.data, data);
-            } else {
-                temp = response.data;
-            }
-            divModalContent.innerHTML = temp;
-            divModal.style.display = "block";
-        });
     };
     self.showTemplate = function(templateId, data) {
+        if (divModal === null) {
+            fnLoadModal();
+        }
         divModalContent.style.width = "70%";
         divModalContent.style.height = "70vh";
         divModalContent.style.marginTop = "20vh";
+        divModalContent.style.padding = "1vh";
         divModalContent.clear();
         var template = dom.getById(templateId);
         var temp = "";
@@ -2394,24 +2493,80 @@ function Modal() {
         divModalContent.innerHTML = temp;
         divModal.style.display = "block";
     };
-    self.showInfo = function(title, message, buttonText) {};
+    self.showInfo = function(message, title, buttonText) {
+        if (divModal === null) {
+            fnLoadModal();
+        }
+        if (typeof title == "undefined") {
+            title = "Info";
+        }
+        if (typeof buttonText == "undefined") {
+            buttonText = "Ok";
+        }
+        divModalContent.style.width = "80%";
+        divModalContent.style.height = "40%";
+        divModalContent.style.marginTop = "40%";
+        divModalContent.style.padding = "10px";
+        divModalContent.clear();
+        divTitle = dom.create("div");
+        divTitle.style.height = "25%";
+        divTitle.style.width = "100%";
+        divTitle.style.float = "left";
+        divTitle.innerHTML = title;
+        divMessage = dom.create("div");
+        divMessage.style.height = "50%";
+        divMessage.style.width = "100%";
+        divMessage.style.float = "left";
+        divMessage.innerHTML = message;
+        divButton = dom.create("div");
+        divButton.style.height = "25%";
+        divButton.style.width = "50%";
+        divButton.style.float = "right";
+        divButton.addClass("button");
+        divButton.addClass("go");
+        divButton.onclick = function() {
+            self.hide();
+        };
+        divButton.innerHTML = buttonText;
+        divModalContent.appendChild(divTitle);
+        divModalContent.appendChild(divMessage);
+        divModalContent.appendChild(divButton);
+        divModal.style.display = "block";
+    };
     self.showWait = function(message) {
-        divModalContent.style.width = "50%";
-        divModalContent.style.height = "25vh";
-        divModalContent.style.marginTop = "25vh";
+        if (divModal === null) {
+            fnLoadModal();
+        }
+        divModalContent.style.width = "80%";
+        divModalContent.style.height = "20vh";
+        divModalContent.style.marginTop = "40vh";
+        divModalContent.style.padding = "4vh";
         divModalContent.clear();
         if (typeof message == "undefined") {
             message = "Espere, por favor";
         }
         var txt = document.createTextNode(message);
+        var img = document.createElement("img");
+        img.src = "img/preloader.gif";
+        img.style.width = "90%";
+        img.style.marginLeft = "5%";
+        img.style.float = "left";
         divModalContent.appendChild(txt);
+        divModalContent.appendChild(document.createElement("br"));
+        divModalContent.appendChild(document.createElement("br"));
+        divModalContent.appendChild(img);
         divModal.style.display = "block";
     };
     self.hide = function() {
+        if (divModal === null) {
+            fnLoadModal();
+        }
         divModal.style.display = "none";
         divModalContent.clear();
     };
 }
+
+var modal = new Modal();
 
 function Watcher() {
     var self = this;
@@ -2435,3 +2590,214 @@ function Watcher() {
     };
     setInterval(fn, 200);
 }
+
+function Validations() {
+    var self = this;
+    var validateType = function(value, type, i) {
+        if (typeof i == "undefined") {
+            i = -1;
+        }
+        if (type === null) {
+            if (value !== null) {
+                throw new Exception("Argument " + i + " different type. It can be null also", "validateArguentTypes");
+            }
+            return;
+        }
+        if (typeof type == "function" || typeof type == "object") {
+            if (value.constructor != type) {
+                throw new Exception("Different constructor at index position " + i, " validateArgumentsTypes");
+            }
+            return;
+        }
+        if (typeof value != type) {
+            throw new Exception("Different type at index position " + i, " validateArgumentsTypes");
+        }
+    };
+    var validateArgumentsTypes = function(args, types) {
+        var i = 0;
+        for (i = 0; i < args.length; i++) {
+            var type = types[i];
+            var value = args[i];
+            if (Object.prototype.toString.call(type) === "[object Array]") {
+                var count = 0;
+                var exception = null;
+                type.forEach(function(item, index) {
+                    try {
+                        self.validateType(value, item, i);
+                    } catch (ex) {
+                        if (ex instanceof Exception) {
+                            exception = ex;
+                            count++;
+                            return;
+                        }
+                        console.error(ex);
+                    }
+                });
+                if (type.length == count) {
+                    throw exception;
+                }
+                continue;
+            }
+            validateType(value, type, i);
+        }
+        return true;
+    };
+    var validateArgumentsNumber = function(args, quantity) {
+        if (args.length != quantity) {
+            throw new Exception("Must set " + quantity + " arguments", this);
+        }
+    };
+    self.args = function(_args, number, types) {
+        validateArgumentsNumber(_args, number);
+        validateArgumentsTypes(_args, types);
+    };
+    var queue = [];
+    self.add = function(obj, options, message) {
+        queue.push([ obj, options, message ]);
+        return self;
+    };
+    self.isArray = function(obj) {
+        if (Object.prototype.toString.call(obj) === "[object Array]") {
+            return true;
+        }
+        return false;
+    };
+    self.isFunction = function(fn) {
+        return fn && Object.prototype.toString.call(fn) === "[object Function]";
+    };
+    self.rules = {
+        REQUIRED: function(obj, message) {
+            if (obj === null || typeof obj == "undefined") {
+                queue = [];
+                if (typeof message == "undefined") {
+                    message = String(obj) + " is required";
+                }
+                throw new Exception(message, "Validations.REQUIRED");
+            }
+            return true;
+        },
+        NONEMPTY: function(obj, message) {
+            if (obj == "" || obj === null || typeof obj == "undefined") {
+                queue = [];
+                if (typeof message == "undefined") {
+                    message = String(obj) + " is empty";
+                }
+                throw new Exception(message, "Validations.NONEMPTY");
+            }
+            return true;
+        },
+        NUMERIC: function(obj, message) {
+            if (!Math.isNumeric(obj)) {
+                queue = [];
+                if (typeof message == "undefined") {
+                    message = String(obj) + " is not numeric";
+                }
+                throw new Exception(message, "Validations.NUMERIC");
+            }
+            return true;
+        },
+        INTEGER: function(obj, message) {
+            if (!Number.isInteger(obj)) {
+                queue = [];
+                if (typeof message == "undefined") {
+                    message = String(obj) + " is not integer";
+                }
+                throw new Exception(message, "Validations.INTEGER");
+            }
+            return true;
+        },
+        EMAIL: function(obj, message) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(obj)) {
+                queue = [];
+                if (typeof message == "undefined") {
+                    message = String(obj) + " is not EMAIL";
+                }
+                throw new Exception(message, "Validations.EMAIL");
+            }
+            return true;
+        }
+    };
+    self.validate = function() {
+        if (queue.length === 0) {
+            return true;
+        }
+        queue.forEach(function(item, index) {
+            if (!self.isArray(item)) {
+                queue = [];
+                throw new Exception("Item is not an array", "Validations.validate.isArray");
+            }
+            if (item.length != 3) {
+                queue = [];
+                throw new Exception("The rule has more or less than three arguments. Only a value, a name and a set of rules are necessary", "Validations.validate");
+            }
+            var val = item[0];
+            var message = item[2];
+            var rules = item[1];
+            if (self.isFunction(rules)) {
+                rules = [ rules ];
+            }
+            if (!self.isArray(rules)) {
+                throw new Exception("Rules is not an array", "Validations.validate.Rules.isArray");
+            }
+            rules.forEach(function(rule) {
+                rule(val, message);
+            });
+        });
+        queue = [];
+        return true;
+    };
+}
+
+var validations = new Validations();
+
+var VALIDATION_RULES = validations.rules;
+
+function Activity(config) {
+    console.log(config);
+    var self = this;
+    self.containerId = config.containerId;
+    self.url = config.url;
+    var view = new View(self.containerId);
+    var animationActivityLeft = {
+        name: "animationActivityLeft",
+        duration: "300ms",
+        from: {
+            left: "-100%"
+        },
+        to: {
+            left: "0"
+        }
+    };
+    var animationActivityRight = {
+        name: "animationActivityRight",
+        duration: "300ms",
+        from: {
+            left: "0"
+        },
+        to: {
+            left: "-100%"
+        }
+    };
+    self.hide = function() {
+        if (view.content === null) {
+            view = new View(self.containerId);
+        }
+        view.content.removeClass("animateclassanimationActivityLeft");
+        view.content.addClass("animateclassanimationActivityRight");
+    };
+    self.load = function(data) {
+        console.log(view);
+        if (view.content === null) {
+            view = new View(self.containerId);
+        }
+        if (typeof data == "undefined") {
+            data = null;
+        }
+        view.loadUrl(self.url, data, function() {
+            view.content.removeClass("animateclassanimationActivityRight");
+            view.content.addClass("animateclassanimationActivityLeft");
+        });
+    };
+}
+

@@ -1,4 +1,3 @@
-/** DateHelper **/
 function DateHelper() {
   var self = this;
 
@@ -43,8 +42,8 @@ function DateHelper() {
     return dateParts;
   };
 
-  var dateDiffPeriods = function(date1, date2){
-    var diff = date1-date2;
+  self.diff = function(date1, date2){
+    var diff = date2 - date1;
     var seconds = parseFloat((diff / 1000).toFixed(2));
     var minutes = parseFloat((seconds / 60).toFixed(2));
     var hours = parseFloat((minutes / 60).toFixed(2));
@@ -60,47 +59,19 @@ function DateHelper() {
       year: years
     }; // end object return
   } // end dateDiffPeriods
-
-  var getInterval = function( interval ) {
-    var intervals = {
-      s: "second",
-      sec: "second",
-      second: "second",
-      S: "second",
-      SEC: "second",
-      SECOND: "second",
-      m: "minute",
-      min: "minute",
-      minute: "minute",
-      MIN: "minute",
-      MINUTE: "minute",
-      h: "hour",
-      H: "hour",
-      hour: "hour",
-      Hour: "hour",
-      HOUR: "hour",
-      d: "day",
-      day: "day",
-      D: "day",
-      DAY: "day",
-      M: "month",
-      MONTH: "month",
-      month: "month",
-      Y: "year",
-      y: "year",
-      year: "year",
-      YEAR: "year",
-    }; // intervals
-
-    if ( intervals.hasOwnProperty( interval ) ) {
-      return intervals[interval];
-    } // end if intervals
-
-    console.error( interval + " interval do not exists" );
-  }; // end gerInterval
-
-  self.dateDiff = function( interval, date1, date2 ) {
-    var diffs = dateDiffPeriods( date1, date2 );
-    return diffs[ getInterval( interval ) ];
-  }; // end dateDiff
 } // end function DateHelper
+
+window.date = new DateHelper();
+
+/**
+ * Returns difference in dates
+ *
+ * @param {Date} date2 The date to compare
+ *
+ * @return {object}
+ */
+Date.prototype.diff = function( date2 ) {
+  var self = this;
+  return date.diff( self, date2 );
+}; // end Date diff
+

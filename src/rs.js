@@ -41,6 +41,9 @@ function RS() {
    * @param bindable The expression to evaluate
    */
   this.returnValue = function(bindable) {
+    if ( bindable === null ) {
+      return null;
+    } // end if bindable is null
     var self = this;
     var parts = bindable.split(".");
 
