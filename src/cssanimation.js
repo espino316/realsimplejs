@@ -3,7 +3,7 @@
  *
  * @return {undefined}
  */
-function CssAnimation(name) {
+RS.CssAnimation = function( name ) {
   this.name = name;
   this.from = new CssRule("from");
   this.to = new CssRule("to");

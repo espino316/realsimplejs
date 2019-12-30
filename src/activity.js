@@ -1,6 +1,6 @@
-function Activity(config) {
-  console.log( config );
-  var self = this;
+RS.Activity = function( config ) {
+
+  const self = this;
   self.containerId = config.containerId;
   self.url = config.url;
   var view = new View(self.containerId);
@@ -36,7 +36,6 @@ function Activity(config) {
   }; // end function hide
 
   self.load = function(data) {
-    console.log( view );
     if ( view.content === null ) {
       view = new View(self.containerId);
     }

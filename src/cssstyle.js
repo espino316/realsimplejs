@@ -3,7 +3,7 @@
  *
  * @return {undefined}
  */
-function CssStyle() {}
+RS.CssStyle = function() {}
 
 CssStyle.prototype.classes = [];
 CssStyle.prototype.addClass = function(cssClass) {

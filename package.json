@@ -1,0 +1,34 @@
+{
+  "name": "realsimplejs",
+  "version": "2.0.0",
+  "description": "Real Simple Javascript framework",
+  "main": "index.js",
+  "directories": {
+    "example": "example",
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "uglify-js": "^3.7.2",
+    "uglifycss": "0.0.29",
+    "jest": "^24.7.1"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/espino316/realsimplejs.git"
+  },
+  "keywords": [
+    "Javascript",
+    "Framework",
+    "Simple"
+  ],
+  "author": "Luis Espino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/espino316/realsimplejs/issues"
+  },
+  "homepage": "https://github.com/espino316/realsimplejs#readme"
+}

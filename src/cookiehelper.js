@@ -5,10 +5,17 @@
  *
  * @return {undefined}
  */
-function CookieHelper() {
+RS.CookieHelper = function() {
+
   var self = this;
 
   self.set = function(name, value, days) {
+
+    //  If not days speficied, set to one hour
+    if (!days) {
+      days = 1/24;
+    } // end if not days
+
     var date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     var expiresAt = "expires=" + date.toUTCString();

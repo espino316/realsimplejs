@@ -4,7 +4,7 @@ Functions for modal dialogs
 Dependencies
   Cordova
  */
-function Dialog() {
+RS.Dialog = function () {
   this.showAlert = function(msg, title, buttonText) {
     if (typeof navigator.notification == "undefined") {
       alert(msg);
@@ -36,5 +36,3 @@ function Dialog() {
     }
   };
 } // end function Dialog
-
-window.dlg = new Dialog();

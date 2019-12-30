@@ -1,10 +1,10 @@
-function KeyValuePair(key, value) {
+RS.KeyValuePair = function (key, value) {
   var self = this;
   self.key = key;
   self.value = value;
 } // end function KeyValuePair
 
-function Hashtable() {
+RS.Hashtable = function() {
   var self = this;
   var table = [];
 

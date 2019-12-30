@@ -3,7 +3,7 @@
  *
  * @return {undefined}
  */
-function Http() {
+RS.Http = function() {
 
   var self = this;
   var dom = new Dom();

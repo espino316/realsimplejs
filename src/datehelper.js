@@ -1,4 +1,4 @@
-function DateHelper() {
+RS.DateHelper = function() {
   var self = this;
 
   self.timestamp = function() {
@@ -59,19 +59,8 @@ function DateHelper() {
       year: years
     }; // end object return
   } // end dateDiffPeriods
+
+  self.now = function() {
+    return new Date().getTime();
+  };
 } // end function DateHelper
-
-window.date = new DateHelper();
-
-/**
- * Returns difference in dates
- *
- * @param {Date} date2 The date to compare
- *
- * @return {object}
- */
-Date.prototype.diff = function( date2 ) {
-  var self = this;
-  return date.diff( self, date2 );
-}; // end Date diff
-

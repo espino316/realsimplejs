@@ -5,10 +5,10 @@
  *
  * @return {undefined}
  */
-function Dom() {
+RS.Dom = function () {
   var self = this;
-  var arrowUp = " " + "&#8679;".unescapeHTML();
-  var arrowDown = " " + "&#8681;".unescapeHTML();
+  var arrowUp = " " + RS.Strings.unescapeHTML("&#8679;");
+  var arrowDown = " " + RS.Strings.unescapeHTML("&#8681;");
 
   var getInput = function(name, value) {
     var input = dom.create("input");

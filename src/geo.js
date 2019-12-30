@@ -11,7 +11,7 @@ Dependencies
 /*
 This contains the structure data
 */
-function GeoPosition() {
+RS.GeoPosition = function() {
   var dlg = new Dialog();
   var local = new Local();
 
@@ -29,7 +29,7 @@ function GeoPosition() {
   this.Address = "";
 } // end class GeoPosition
 
-function Geo() {
+RS.Geo = function() {
   var fn = null;
   this.onError = function(error) {
     dlg.showAlert("Hubo problemas obteniendo la posicion");
@@ -37,7 +37,7 @@ function Geo() {
 
   this.onSuccessGetPosition = function(position) {
     local.remove("currentGeoPosition");
-    var geoPos = new GeoPosition();
+    var geoPos = new RS.GeoPosition();
 
     geoPos.Lat = parseFloat(position.coords.latitude);
     geoPos.Lng = parseFloat(position.coords.longitude);

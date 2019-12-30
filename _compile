@@ -1,0 +1,14 @@
+
+node_modules/uglify-js/bin/uglifyjs -c -o release/realsimple.min.js src/overrides.js src/rs.js src/cookiehelper.js
+echo "realsimple.min.js generated."
+
+node_modules/uglify-js/bin/uglifyjs -b -o release/realsimple.js src/overrides.js src/rs.js src/cookiehelper.js
+echo "realsimple.js generated."
+
+cp src/realsimple.css release/realsimple.css
+echo "realsimple.css copied."
+
+node_modules/uglifycss/uglifycss src/realsimple.css > release/realsimple.min.css
+echo "realsimple.min.css generated."
+echo ""
+echo "DONEZO!"

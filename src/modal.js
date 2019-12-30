@@ -1,7 +1,7 @@
 /**
  * Handles the modal
  */
-function Modal() {
+RS.Modal = function() {
   var self = this;
   var divModal = dom.getById("modalContainer");
   var divModalContent = dom.getById("modalContent");
