@@ -1,4 +1,4 @@
-function PubSub() {
+RS.PubSub = function() {
   var self = this;
   self.channels = {},
 

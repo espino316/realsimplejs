@@ -27,45 +27,6 @@ define(
   ){
     "use strict";
 
-    /* Overload HTMLElmenet with view behavior */
-    HTMLElement.prototype.loadUrl = function(url, data, callback) {
-      var self = this;
-      if (typeof self.id == "undefined") {
-        self.id = "htmlelement_" + "".UUID();
-      } // end if id undefined
-
-      if (typeof self.view == "undefined") {
-        self.view = new View(self.id);
-      } // end if view undefined
-
-      self.view.loadUrl(url, data, callback);
-    }; // end function HTMLElement.loadUrl
-
-    HTMLElement.prototype.loadTemplate = function(id, data) {
-      var self = this;
-      if (typeof self.id == "undefined") {
-        self.id = "htmlelement_" + "".UUID();
-      } // end if id undefined
-
-      if (typeof self.view == "undefined") {
-        self.view = new View(self.id);
-      } // end if view undefined
-
-      self.view.loadTemplate(id, data);
-    }; // end function HTMLElement.loadTemplate
-
-    HTMLElement.prototype.loadHTML = function(html, data) {
-      var self = this;
-      if (typeof self.id == "undefined") {
-        self.id = "htmlelement" + rand();
-      } // end if id undefined
-
-      if (typeof self.view == "undefined") {
-        self.view = new View(self.id);
-      } // end if view undefined
-
-      self.view.loadHTML(html, data);
-    }; // end function HTMLElement.loadTemplate
 
     window.rs = new RS();
     rs.object = new RSObject();

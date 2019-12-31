@@ -1,7 +1,7 @@
 /**
  *  Holds the function for Restful calls
  */
-function Restful(resourceUrl) {
+RS.Restful = function ( resourceUrl ) {
 
   var http = new Http();
 

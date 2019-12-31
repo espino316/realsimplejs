@@ -1,6 +1,6 @@
-function Subject() {
+RS.Subject = function () {
 
-  const self = this;
+  var self = this;
 
   self.subscriptions = [];
   self.isCompleted = false;
@@ -44,35 +44,6 @@ function Subject() {
     self.isCompleted = true;
   }; // end function complete
 } // end function RSSubject
-
-var s = new Subject();
-s.subscribe(
-  v => {
-    console.log(v);
-  },
-  e => {
-    console.error(e);
-  },
-  () => {
-    console.log("completed 1");
-  }
-);
-s.subscribe(
-  v => {
-    console.log(v);
-  },
-  e => {
-    console.error(e);
-  },
-  () => {
-    console.log("completed 2");
-  }
-);
-
-s.next("some");
-s.next("dude");
-s.complete();
-
 
 function RsObservable(observer) {
 

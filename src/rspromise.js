@@ -77,7 +77,7 @@
    *
    * @return {undefined}
    */
-  function RSPromise( functionPromise ) {
+  RS.Promise = function( functionPromise ) {
     // To self reference
     var self = this;
 
@@ -272,6 +272,4 @@
       ); // end functionPromise call
     } // end if functionPromise
   } // end RSPromise
-
-  window.RSPromise = RSPromise;
 })();
