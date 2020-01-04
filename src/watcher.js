@@ -1,14 +1,14 @@
 /**
  * Watch variables and report changes
  */
-function Watcher() {
+RS.Watcher = function () {
   var self = this;
   this.collection = [];
 
   this.add = function(name, fn) {
     var item = {};
     item.name = name;
-    item.currentValue = rs.returnValue(name);
+    item.currentValue = RS.returnValue(name);
     item.function = fn;
     this.collection.push(item);
   }; // end function add

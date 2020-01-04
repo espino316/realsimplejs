@@ -3,19 +3,18 @@
  *
  * @return {undefined}
  */
-function CssRule(ruleName) {
+RS.CssRule = function (ruleName) {
   this.ruleName = ruleName;
   this.properties = {};
 }
 
-CssRule.prototype.ruleName = "";
+RS.CssRule.prototype.ruleName = "";
 
-CssRule.prototype.addProperty = function(propertyName, propertyValue) {
-  var self = this;
-  self.properties[propertyName] = propertyValue;
+RS.CssRule.prototype.addProperty = function(propertyName, propertyValue) {
+  this.properties[propertyName] = propertyValue;
 };
 
-CssRule.prototype.toString = function() {
+RS.CssRule.prototype.toString = function() {
   var css = "." + this.ruleName + " {\n";
   var keys = Object.keys(this.properties);
   var len = keys.length;

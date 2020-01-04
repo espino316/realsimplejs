@@ -5,11 +5,13 @@
  */
 RS.CssStyle = function() {}
 
-CssStyle.prototype.classes = [];
-CssStyle.prototype.addClass = function(cssClass) {
+RS.CssStyle.prototype.classes = [];
+
+RS.CssStyle.prototype.addClass = function(cssClass) {
   this.classes.push(cssClass);
 };
-CssStyle.prototype.toString = function() {
+
+RS.CssStyle.prototype.toString = function() {
   var len = this.classes.length;
   var i;
   var css = "";
@@ -19,7 +21,7 @@ CssStyle.prototype.toString = function() {
   return css;
 };
 
-CssStyle.prototype.setStyle = function() {
+RS.CssStyle.prototype.setStyle = function() {
   var style = document.createElement("style");
   style.type = "text/css";
   style.innerHTML = this.toString();

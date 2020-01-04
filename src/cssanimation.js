@@ -9,11 +9,11 @@ RS.CssAnimation = function( name ) {
   this.to = new CssRule("to");
 }
 
-CssAnimation.prototype.name = "";
-CssAnimation.prototype.from = null;
-CssAnimation.prototype.to = null;
+RS.CssAnimation.prototype.name = "";
+RS.CssAnimation.prototype.from = null;
+RS.CssAnimation.prototype.to = null;
 
-CssAnimation.prototype.toString = function() {
+RS.CssAnimation.prototype.toString = function() {
   var css = "@keyframes " + this.name + " {\n@from\n@to\n}";
   var cssFrom = this.from.toString();
   var cssTo = this.to.toString();

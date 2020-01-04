@@ -1,5 +1,9 @@
 RS.Array = function ( arr ) {
 
+  if (!arr) {
+    arr = [];
+  } // end if not arr
+
   arr.getUnique = function() {
     var u = {}, a = [];
     for (var i = 0, l = this.length; i < l; ++i) {
@@ -149,7 +153,7 @@ RS.Array = function ( arr ) {
      * Gets the value, if is numeric, return number data
      */
     var getValue = function(v) {
-      if (Math.isNumeric(v)) {
+      if (RS.Math.isNumeric(v)) {
         return v * 1;
       } // end if isNumeric
       return v;
@@ -172,7 +176,7 @@ RS.Array = function ( arr ) {
     }; // end function compareAsc
 
     //  If not numeric, sort by key
-    if (Math.isNumeric(row[property])) {
+    if (RS.Math.isNumeric(row[property])) {
       return self.sort(compareAscNumber);
     } else {
       return self.sort(compareAsc);
@@ -203,7 +207,7 @@ RS.Array = function ( arr ) {
     window.__tempFilter = property;
 
     var getValue = function(v) {
-      if (Math.isNumeric(v)) {
+      if (RS.Math.isNumeric(v)) {
         return v * 1;
       }
       return v;
@@ -226,7 +230,7 @@ RS.Array = function ( arr ) {
     }; // end function compareAsc
 
     //  If not numeric, sort by key
-    if (Math.isNumeric(row[property])) {
+    if (RS.Math.isNumeric(row[property])) {
       return self.sort(compareDescNumber);
     } else {
       return self.sort(compareDesc);
@@ -243,7 +247,7 @@ RS.Array = function ( arr ) {
         fn(self[i], i, self);
       } // end for
     } catch (e) {
-      if (e !== BreakException) throw e;
+      if (e !== RS.BreakException) throw e;
     } // end catch
   }; // end forEach
 
@@ -280,4 +284,5 @@ RS.Array = function ( arr ) {
     return sum;
   }; // end Array.sum
 
+  return arr;
 }; // end RS Array

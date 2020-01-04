@@ -1,9 +1,14 @@
+RS.ActivityConfig = {
+  containerId: "",
+  url: ""
+};
+
 RS.Activity = function( config ) {
 
-  const self = this;
+  var self = this;
   self.containerId = config.containerId;
   self.url = config.url;
-  var view = new View(self.containerId);
+  var view = new RS.View(self.containerId);
 
   var animationActivityLeft = {
     name: "animationActivityLeft",
@@ -29,7 +34,7 @@ RS.Activity = function( config ) {
 
   self.hide = function() {
     if ( view.content === null ) {
-      view = new View(self.containerId);
+      view = new RS.View(self.containerId);
     }
     view.content.removeClass("animateclassanimationActivityLeft");
     view.content.addClass("animateclassanimationActivityRight");

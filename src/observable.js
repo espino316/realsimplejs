@@ -20,9 +20,12 @@ RS.Observable = function ( subscribe ) {
    */
   self.subscribe = function(
     next,
-    error = null,
-    complete = null
+    error,
+    complete
   ) {
+
+    if (typeof error == 'undefined') { error = null }
+    if (typeof complete == 'undefined') { complete = null }
 
     // Here we create and observer
     var observer = new Observer(next, error, complete);
@@ -93,11 +96,13 @@ RS.Observable.of = function () {
     function (observer) {
 
       // Loop through the arguments
-      for (let arg of args) {
-
-        //  Call the next function
-        observer.next(arg);
-      } // end for each argument
+      RS.forEach(
+        args,
+        function ( arg ) {
+          //  Call the next function
+          observer.next(arg);
+        } // end function anonymous
+      ); // end for each
 
       //  Call complete
       observer.complete();
@@ -126,11 +131,10 @@ RS.Observable.from = function (values) {
   return new Observable(function (observer) {
 
     //  Loop through the values
-    for (let value of values) {
-
+    RS.forEach(values, function(value) {
       //  Call next function
       observer.next(value);
-    } // end for each
+    }); // end function foreach
 
     //  Call complete function
     observer.complete();

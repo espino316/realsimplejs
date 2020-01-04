@@ -1,9 +1,9 @@
 /**
  * Handles load content into HTMLElements
  */
-function View(id) {
+RS.View = function ( id ) {
   var self = this;
-  var dom = new Dom();
+  var dom = new RS.Dom();
 
   self.contentId = id;
   self.content = dom.getById(self.contentId);

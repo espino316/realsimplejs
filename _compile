@@ -1,8 +1,66 @@
+node_modules/uglify-js/bin/uglifyjs -c -o release/realsimple.min.js \
+src/rs.js \
+src/rsobject.js \
+src/string.js \
+src/htmlelement.js \
+src/array.js \
+src/datehelper.js \
+src/math.js \
+src/json.js \
+src/local.js \
+src/session.js \
+src/activity.js \
+src/cookies.js \
+src/cssanimation.js \
+src/cssrule.js \
+src/cssstyle.js \
+src/dom.js \
+src/exceptions.js \
+src/geo.js \
+src/hashtable.js \
+src/http.js \
+src/modal.js \
+src/observable.js \
+src/observer.js \
+src/pubsub.js \
+src/restful.js \
+src/rspromise.js \
+src/rssubject.js \
+src/validations.js \
+src/view.js
 
-node_modules/uglify-js/bin/uglifyjs -c -o release/realsimple.min.js src/overrides.js src/rs.js src/cookiehelper.js
 echo "realsimple.min.js generated."
 
-node_modules/uglify-js/bin/uglifyjs -b -o release/realsimple.js src/overrides.js src/rs.js src/cookiehelper.js
+node_modules/uglify-js/bin/uglifyjs -b -o release/realsimple.js \
+src/rs.js \
+src/rsobject.js \
+src/string.js \
+src/htmlelement.js \
+src/array.js \
+src/datehelper.js \
+src/math.js \
+src/json.js \
+src/local.js \
+src/session.js \
+src/activity.js \
+src/cookies.js \
+src/cssanimation.js \
+src/cssrule.js \
+src/cssstyle.js \
+src/dom.js \
+src/exceptions.js \
+src/geo.js \
+src/hashtable.js \
+src/http.js \
+src/modal.js \
+src/observable.js \
+src/observer.js \
+src/pubsub.js \
+src/restful.js \
+src/rspromise.js \
+src/rssubject.js \
+src/validations.js \
+src/view.js
 echo "realsimple.js generated."
 
 cp src/realsimple.css release/realsimple.css

@@ -18,7 +18,14 @@ var getAll = function() {
   return params;
 }; // end getAll
 
+var validateWindow = function() {
+  return (window);
+};
+
 RS.SessionStorage.set = function(itemKey, itemValue) {
+
+  if (!validateWindow()) { console.log('No window. Exit RS.SessionStorage.set'); return; }
+
   if (typeof itemValue == "object") {
     itemValue = JSON.stringify(itemValue);
   } // end if itemValue object
@@ -26,10 +33,17 @@ RS.SessionStorage.set = function(itemKey, itemValue) {
 };
 
 RS.SessionStorage.remove = function(itemKey) {
+
+  if (!validateWindow()) { console.log('No window. Exit RS.SessionStorage.remove'); return; }
+
   window.sessionStorage.removeItem(itemKey);
 };
 
 RS.SessionStorage.get = function(itemKey) {
+
+
+  if (!validateWindow()) { console.log('No window. Exit RS.SessionStorage.get'); return; }
+
   if (typeof itemKey == "undefined") {
     return getAll();
   } // end if itemKey undefined
@@ -48,5 +62,8 @@ RS.SessionStorage.get = function(itemKey) {
 };
 
 RS.SessionStorage.exists = function(itemKey) {
+
+  if (!validateWindow()) { console.log('No window. Exit RS.SessionStorage.get'); return; }
+
   return window.sessionStorage.getItem(itemKey) !== null;
 };

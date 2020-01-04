@@ -10,9 +10,12 @@
  **/
 RS.Observer = function (
   next,
-  error = null,
-  complete = null
-) {
+  error,
+  complete
+  ) {
+
+  if (typeof error == 'undefined') { error = null }
+  if (typeof complete == 'undefined') { complete = null }
 
   var self = this;
 

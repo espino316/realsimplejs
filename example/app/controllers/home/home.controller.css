@@ -1,0 +1,11 @@
+.title {
+  font-size: 12pt;
+}
+
+.module-list {
+  border: 1px solid black;
+}
+
+.module {
+  float: left;
+}

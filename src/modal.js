@@ -35,8 +35,6 @@ RS.Modal = function() {
 
   var self = this;
 
-  self.trimereet = "";
-
   self.showUrl = function(url, data) {
     if (divModal === null) {
       fnLoadModal();

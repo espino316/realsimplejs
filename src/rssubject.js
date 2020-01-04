@@ -7,11 +7,15 @@ RS.Subject = function () {
 
   self.subscribe = function (
     next,
-    error = null,
-    complete = null
+    error,
+    complete
   ) {
+
+    if (typeof error == 'undefined') { error = null }
+    if (typeof complete == 'undefined') { complete = null }
+
     self.subscriptions.push({
-      next, error, complete
+      next: next, error: error, complete: complete
     });
   }; // end subscribe
 
@@ -21,44 +25,33 @@ RS.Subject = function () {
       return;
     } // end if self is completed
 
-    for (let subscription of self.subscriptions) {
-      try {
-        subscription.next(value);
-      } catch (err) {
-        subscription.error(err);
-      } // end try catch
-    } // end for each subscription
+    RS.forEach(
+      self.subscriptions,
+      function (subscription) {
+        try {
+          subscription.next(value);
+        } catch (err) {
+          subscription.error(err);
+        } // end try catch
+      } // end anonymous subscriptions
+    ); // end for each
   }; // end self.next
 
   self.complete = function() {
-    for (let subscription of self.subscriptions) {
-      try {
-        if (subscription.complete) {
-          subscription.complete();
-        } // end if subscription.complete
-      } catch (err) {
-        subscription.error(err);
-      } // end try catch
-    } // end for each subscription
+
+    RS.forEach(
+      self.subscriptions,
+      function ( subscription ) {
+        try {
+          if (subscription.complete) {
+            subscription.complete();
+          } // end if subscription.complete
+        } catch (err) {
+          subscription.error(err);
+        } // end try catch
+      } // end anonymous function
+    ); // end for each
 
     self.isCompleted = true;
   }; // end function complete
-} // end function RSSubject
-
-function RsObservable(observer) {
-
-  var self = this;
-  self.suscriptions = [];
-
-  self.subscribe = function(
-    next,
-    error = null,
-    completed = null
-  ) {
-    self.subscriptions.push({
-      next, error, completed
-    });
-  }; // end subscribe
-
-} // end RSObserbable
-
+} // end function RS.Subject

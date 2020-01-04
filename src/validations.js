@@ -1,7 +1,7 @@
 /**
  * Validations functions
  */
-function Validations() {
+RS.Validations = function () {
   var self = this;
 
   /**
@@ -169,74 +169,6 @@ function Validations() {
   }; // end self isFunction
 
   /**
-   * Set of rules for validation
-   */
-  self.rules = {
-    REQUIRED: function(obj, message) {
-      if (obj === null || typeof obj == "undefined") {
-        queue = [];
-
-        if (typeof message == "undefined") {
-          message = String(obj) + " is required";
-        } // end if message
-
-        throw new Exception(message, "Validations.REQUIRED");
-      } // end if null
-      return true;
-    },
-    NONEMPTY: function(obj, message) {
-      if (obj == "" || obj === null || typeof obj == "undefined" ) {
-        queue = [];
-
-        if (typeof message == "undefined") {
-          message = String(obj) + " is empty";
-        } // end if message
-
-        throw new Exception(message, "Validations.NONEMPTY");
-      } // end if empty
-      return true;
-    },
-    NUMERIC: function(obj, message) {
-      if (!Math.isNumeric(obj)) {
-        queue = [];
-
-        if (typeof message == "undefined") {
-          message = String(obj) + " is not numeric";
-        } // end if message
-
-        throw new Exception(message, "Validations.NUMERIC");
-      } // end if not numeric
-      return true;
-    },
-    INTEGER: function(obj, message) {
-      if (!Number.isInteger(obj)) {
-        queue = [];
-
-        if (typeof message == "undefined") {
-          message = String(obj) + " is not integer";
-        } // end if message
-
-        throw new Exception(message, "Validations.INTEGER");
-      } // end if not numeric
-      return true;
-    },
-    EMAIL: function(obj, message) {
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-      if (!re.test(obj)) {
-        queue = [];
-
-        if (typeof message == "undefined") {
-          message = String(obj) + " is not EMAIL";
-        } // end if message
-
-        throw new Exception(message, "Validations.EMAIL");
-      } // end if not numeric
-      return true;
-    } // end email function
-  }; // end object rules
-
-  /**
    * Execute all validations in the queue
    *
    * @return {bool}
@@ -290,7 +222,73 @@ function Validations() {
     queue = [];
     return true;
   }; // end function validate
-} // end function validations
+} // end function RS.Validations
 
-var validations = new Validations();
-var VALIDATION_RULES = validations.rules;
+/**
+ * Set of rules for validation
+ */
+RS.Validations.RULES = {
+  REQUIRED: function(obj, message) {
+    if (obj === null || typeof obj == "undefined") {
+      queue = [];
+
+      if (typeof message == "undefined") {
+        message = String(obj) + " is required";
+      } // end if message
+
+      throw new Exception(message, "Validations.REQUIRED");
+    } // end if null
+    return true;
+  },
+  NONEMPTY: function(obj, message) {
+    if (obj == "" || obj === null || typeof obj == "undefined" ) {
+      queue = [];
+
+      if (typeof message == "undefined") {
+        message = String(obj) + " is empty";
+      } // end if message
+
+      throw new Exception(message, "Validations.NONEMPTY");
+    } // end if empty
+    return true;
+  },
+  NUMERIC: function(obj, message) {
+    if (!Math.isNumeric(obj)) {
+      queue = [];
+
+      if (typeof message == "undefined") {
+        message = String(obj) + " is not numeric";
+      } // end if message
+
+      throw new Exception(message, "Validations.NUMERIC");
+    } // end if not numeric
+    return true;
+  },
+  INTEGER: function(obj, message) {
+    if (!Number.isInteger(obj)) {
+      queue = [];
+
+      if (typeof message == "undefined") {
+        message = String(obj) + " is not integer";
+      } // end if message
+
+      throw new Exception(message, "Validations.INTEGER");
+    } // end if not numeric
+    return true;
+  },
+  EMAIL: function(obj, message) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (!re.test(obj)) {
+      queue = [];
+
+      if (typeof message == "undefined") {
+        message = String(obj) + " is not EMAIL";
+      } // end if message
+
+      throw new Exception(message, "Validations.EMAIL");
+    } // end if not numeric
+    return true;
+  } // end email function
+}; // end object rules
+
