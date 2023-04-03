@@ -2,9 +2,24 @@
 <html>
     <head>
         <title>My Sample Project</title>
-        <!-- data-main attribute tells require.js to load
-             scripts/main.js after require.js loads. -->
-        <script data-main="main" src="require.js"></script>
+        <script type="text/javascript" src="../release/realsimple.min.js"></script>
+        <script type="text/javascript">
+            console.log(RS);
+            console.log(RS.String);
+            console.log(RS.Array);
+            console.log(RS.DateHelper);
+            console.log(RS.CssRule);
+            console.log(RS.CssStyle);
+            console.log(RS.CssAnimation);
+            console.log(RS.Dom);
+            console.log(RS.Exception);
+            console.log(RS.Cookies);
+            console.log(RS.SessionStorage);
+            console.log(RS.Local);
+        </script>
+        <style type="text/css">
+            body { background-color: black; color: white;}
+        </style>
     </head>
     <body>
         <h1>My Sample Project</h1>

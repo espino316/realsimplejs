@@ -9,7 +9,7 @@ function RS() {
    * @param bindable The string of the bindable object
    * @param value The value to assign
    */
-  this.assignValue = function(bindable, value) {
+  self.assignValue = function(bindable, value) {
     if (bindable === null || value === null) {
       return;
     } // end if null
@@ -40,7 +40,7 @@ function RS() {
    * Returns the value for a expression
    * @param bindable The expression to evaluate
    */
-  this.returnValue = function(bindable) {
+  self.returnValue = function(bindable) {
     if ( bindable === null ) {
       return null;
     } // end if bindable is null
@@ -66,13 +66,13 @@ function RS() {
    * Evaluates if an expression is undefined
    * @param bindable The expression to evaluate
    */
-  this.evalUndefined = function(bindable) {
+  self.evalUndefined = function(bindable) {
     var code = "return ( typeof " + bindable + " == 'undefined' );";
     var f = new Function(code);
     return f();
   }; // end function evalUndefined;
 
-  this.defineGetter = function(obj, propName, fnGet) {
+  self.defineGetter = function(obj, propName, fnGet) {
     var parts = obj.split(".");
     var code = "";
     if (parts.length > 1) {
@@ -91,7 +91,7 @@ function RS() {
     f(propName, fnGet);
   };
 
-  this.defineSetter = function(obj, propName, fnSet) {
+  self.defineSetter = function(obj, propName, fnSet) {
     var parts = obj.split(".");
     var code = "";
 

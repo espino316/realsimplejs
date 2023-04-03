@@ -13,7 +13,7 @@ This contains the structure data
 */
 RS.GeoPosition = function() {
   var dlg = new Dialog();
-  var local = new Local();
+  var local = new RS.Local();
 
   this.Lat = 0;
   this.Lng = 0;

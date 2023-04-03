@@ -7,8 +7,9 @@
  */
 RS.Dom = function () {
   var self = this;
-  var arrowUp = " " + RS.Strings.unescapeHTML("&#8679;");
-  var arrowDown = " " + RS.Strings.unescapeHTML("&#8681;");
+  var rsString = new RS.String();
+  var arrowUp = " " + rsString.unescapeHTML("&#8679;");
+  var arrowDown = " " + rsString.unescapeHTML("&#8681;");
 
   var getInput = function(name, value) {
     var input = dom.create("input");
@@ -944,4 +945,4 @@ self.setDataTable = function(id, data, options) {
   }; // end function DataTable
 } // end function Dom
 
-window.dom = new Dom();
+window.dom = new RS.Dom();
