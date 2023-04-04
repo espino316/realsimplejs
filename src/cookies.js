@@ -1,94 +1,101 @@
 /**
- * Helper for cookies
- *
- * Dependencies: overrides.js
- *
- * @return {undefined}
+ * An object containing functions for working with cookies.
+ * @namespace RS.Cookies
  */
-RS.Cookies = function() {} // end function cookieHelper
+RS.Cookies = {} // end function cookieHelper
 
-RS.Cookies.get = function(name) {
-  if (document.cookie === "") {
+/**
+ * Gets a cookie by name.
+ * @function get
+ * @memberof RS.Cookies
+ * @param {string} name - The name of the cookie to get.
+ * @returns {Object|null} - The cookie object with a `name` and `value` property, or an array of all cookies if `name` is undefined. Returns null if no cookie with the specified name is found.
+ */
+RS.Cookies.get = (name) => {
+  if (!document.cookie) {
     return null;
-  } // end if cookie empty
+  }
 
-  var cookies = document.cookie.split("; ");
-  var result = [];
-  var isFound = false;
-  var itemResult = null;
+  const cookies = document.cookie.split(';');
 
-  var fnEach = function(value, index, array) {
-    var keyValue = value.split("=");
-    var item = {};
-    item.name = keyValue[0];
-    item.value = keyValue[1];
+  const result = [];
+  let isFound = false;
+  let itemResult = null;
 
-    if (typeof name != "undefined") {
-      if (name == item.name) {
+  const fnEach = (value) => {
+    const [cookieName, cookieValue] = value.split('=');
+    if (!cookieName) {
+      return;
+    }
+
+    const item = { name: cookieName, value: cookieValue };
+
+    if (name !== undefined) {
+      if (name === item.name) {
         itemResult = item;
         isFound = true;
         return;
-      } // end if name = item.name
+      }
     } else {
       result.push(item);
-    } // end if name
-  }; // end function fnEach
+    }
+  };
 
   cookies.forEach(fnEach);
+
   if (isFound) {
     return itemResult;
+  } else if (name !== undefined) {
+    return null;
   } else {
-    if (typeof name != "undefined") {
-      return null;
-    } else {
-      return result;
-    } // else if name not undefined
-  } // end if then else if found
-}; // end function get
+    return result;
+  }
+};
 
+/**
+ * Sets a cookie with the given name, value, and expiration time.
+ * @function set
+ * @memberof RS.Cookies
+ * @param {string} name - The name of the cookie to set.
+ * @param {string} value - The value of the cookie.
+ * @param {number} [days=1/24] - The number of days until the cookie expires. Defaults to one hour.
+ */
 RS.Cookies.set = function(name, value, days) {
-
-  //  If not days speficied, set to one hour
   if (!days) {
     days = 1/24;
-  } // end if not days
+  }
 
-  var date = new Date();
+  const date = new Date();
   date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  var expiresAt = "expires=" + date.toUTCString();
-  var cookie = name + "=" + value + "; expires=" + expiresAt;
+
+  const expiresAt = `expires=${date.toUTCString()}`;
+  const cookie = `${name}=${value}; ${expiresAt}; SameSite=Strict; Secure`;
   document.cookie = cookie;
-}; // end function set
+};
 
+/**
+ * Deletes a cookie with the given name.
+ * @function delete
+ * @memberof RS.Cookies
+ * @param {string} name - The name of the cookie to delete.
+ * @returns {null} - Returns null if no cookie with the specified name is found.
+ */
 RS.Cookies.delete = function(name) {
-  var _cookies = RS.Cookies.get(name);
+  const cookies = RS.Cookies.get(name);
 
-  if (_cookies === null) {
+  if (cookies === null) {
     return null;
-  } // end if null
+  }
 
-  var fnDelete = function(name) {
-    var expiresAt = "Thu, 01 Jan 1970 00:00:01 GMT";
-    var cookie = name + "=0; expires=" + expiresAt;
+  const fnDelete = (name) => {
+    const expiresAt = "Thu, 01 Jan 1970 00:00:01 GMT";
+    const cookie = `${name}=0; expires=${expiresAt}; path=/; SameSite=Strict; Secure`;
     document.cookie = cookie;
-    cookie = name +
-      "=0; path=/;domain=" +
-      window.location.host +
-      "; expires=" +
-      expiresAt;
-    document.cookie = cookie;
-  }; // end fnDelete
+  };
 
-  if (typeof _cookies.length != "undefined") {
-    if (_cookies.length > 0) {
-      var fnEach = function(item, index, collection) {
-        fnDelete(item.name);
-      }; // end fnEach
-      _cookies.forEach(fnEach);
-    } else {
-      return null;
-    } // en if len > 0
+  if (cookies.length !== undefined && cookies.length > 0) {
+    cookies.forEach(cookie => fnDelete(cookie.name));
   } else {
     fnDelete(name);
-  } // end if len not undefined
-}; // end function clear
+  }
+};
