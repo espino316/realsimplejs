@@ -159,5 +159,3 @@ RS.Modal = function() {
   }; // end function hide
 
 } // end function Modal
-
-var modal = new Modal();

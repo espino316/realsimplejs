@@ -185,5 +185,3 @@ RS.Http = function() {
   // Download a file submiting a form
   self.downloadFile = dom.submitForm;
 } // end class Http
-
-window.http = new Http();
