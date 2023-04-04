@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "npx uglifyjs -c -o release/realsimple.min.js src/rs.js src/string.js src/array.js src/json.js src/math.js src/datehelper.js src/exceptions.js src/hashtable.js src/rsobject.js src/rspromise.js src/rssubject.js src/validations.js src/session.js src/local.js src/cssrule.js src/cssstyle.js src/cssanimation.js src/dom.js src/htmlelement.js src/cookies.js src/geo.js src/http.js src/modal.js src/pubsub.js src/observer.js src/observable.js src/restful.js src/view.js"
+    "build": "npx uglifyjs -c -o release/realsimple.min.js src/rs.js src/string.js src/array.js src/json.js src/math.js src/datehelper.js src/exceptions.js src/hashtable.js src/rsobject.js src/rspromise.js src/rssubject.js src/validations.js src/session.js src/local.js src/cssrule.js src/cssstyle.js src/cssanimation.js src/dom.js src/htmlelement.js src/cookies.js src/geo.js src/http.js src/modal.js src/pubsub.js src/observer.js src/observable.js src/restful.js src/view.js src/store.js"
   },
   "repository": {
     "type": "git",

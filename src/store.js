@@ -8,9 +8,7 @@ RS.Store = function(state) {
     const UPDATE = 'UPDATE';
     const DELETE = 'DELETE';
 
-    if (!state) {
-        state = [];
-    } // end if not state
+    state = new RS.Array(state);
 
     self.reset = function() {
 
@@ -37,17 +35,47 @@ RS.Store = function(state) {
 
     self.update = function(id, storeItem) {
 
+        //  get the item
+        //  perform the update
+        let index = state.indexOf("id", id);
+
+        if (index !== -1) {
+            state.splice(index, storeItem);
+        } // end if index
+
         //  log updating
+        logs.push({event: UPDATE, id: null, timestamp: Date.now(), storeItem});
 
     }; // end update
 
     self.delete = function(id) {
 
+        //  get the item
+        //  perform the update
+        let index = state.indexOf("id", id);
+
+        if (index !== -1) {
+            state.splice(index);
+        } // end if index
+
         //  log deleting
+        logs.push({event: DELETE, id: null, timestamp: Date.now(), id});
 
     }; // end delete
 
     self.get = function(id) {
 
+        if (!id) {
+            return state;
+        } // end if not id
+        
+        let index = state.indexOf("id", id);
+        return state[index];
+
     }; // end get
+
+    self.addMethod = function(methodName, methodFunction) {
+
+        self[methodName] = methodFunction;
+    }; // end function add method
 }; // end Store
