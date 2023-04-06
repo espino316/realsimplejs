@@ -1,4 +1,4 @@
-RS.Store = function(initialState) {
+RS.Store = (initialState) => {
 
     const logs = [];
     const RESET = 'RESET';

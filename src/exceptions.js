@@ -5,7 +5,7 @@ RS.BreakException = {};
  *
  * @return {undefined}
  */
-RS.Exception = function(message, reference) {
+RS.Exception = (message, reference) => {
   this.message = message;
   this.reference = reference;
 }; // end class Exception
