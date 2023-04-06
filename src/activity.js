@@ -3,12 +3,12 @@ RS.ActivityConfig = {
   url: ""
 };
 
-RS.Activity = function( config ) {
+RS.Activity = config => {
 
-  var self = this;
-  self.containerId = config.containerId;
-  self.url = config.url;
-  var view = new RS.View(self.containerId);
+  let self = this;
+  const containerId = config.containerId;
+  const url = config.url;
+  let view = new RS.View(containerId);
 
   var animationActivityLeft = {
     name: "animationActivityLeft",
@@ -32,17 +32,17 @@ RS.Activity = function( config ) {
     }
   };
 
-  self.hide = function() {
+  const hide = () => {
     if ( view.content === null ) {
-      view = new RS.View(self.containerId);
+      view = new RS.View(containerId);
     }
     view.content.removeClass("animateclassanimationActivityLeft");
     view.content.addClass("animateclassanimationActivityRight");
   }; // end function hide
 
-  self.load = function(data) {
+  const load = data => {
     if ( view.content === null ) {
-      view = new View(self.containerId);
+      view = new View(containerId);
     }
 
     if ( typeof data == "undefined" ) {
@@ -50,12 +50,18 @@ RS.Activity = function( config ) {
     } // end if undefined
 
     view.loadUrl(
-      self.url,
+      url,
       data,
-      function() {
+      () => {
         view.content.removeClass("animateclassanimationActivityRight");
         view.content.addClass("animateclassanimationActivityLeft");
       } // end anonymous function
     ); // end loadUrl
   }; // end showActivity
+
+  // return public methods
+  return {
+    hide,
+    load
+  };
 }; // end activity
